@@ -1,0 +1,67 @@
+@import "bourbon"
+@import "neat"
+
+$black: #333333 // text
+$gray-darker: #7A787A // secondary text
+$gray: #BFBFBF // icons
+
+ul
+  margin: 0
+  padding: 0
+
+.page-large
+  @include outer-container
+  margin: 0 auto
+  padding-bottom: 20px
+  max-width: 1024px
+  min-width: 810px
+
+.doctree
+  @include span-columns(3)
+
+.doc
+  @include span-columns(9)
+
+.doctree-toplevel-list
+  margin-left: 0
+  padding-left: 14px
+
+.doctree-sublevel-list
+  margin-left: 14px
+
+.doc-path
+  color: $gray-darker
+  font-size: 14px
+  margin-top: 14px
+
+.doc-section-title
+  margin: 20px 0
+  line-height: 1.1
+
+.doc-section-content-mermaid .label
+  color: $black
+
+.doc-section-editor
+  display: none
+
+  &.editing
+    display: block
+
+.doc-section-editor-content
+  width: 100%
+  height: 10em
+  margin-bottom: 4px
+
+.doc-section-editor-footer
+  color: $gray-darker
+
+.doc-footer
+  margin-top: 60px
+  padding-top: 10px
+  border-top: 1px dotted $gray
+
+.doc-footer-helps
+  margin-left: 0
+
+.doc-footer-helps p
+  margin: 4px 0
