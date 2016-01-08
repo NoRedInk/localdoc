@@ -5,9 +5,10 @@ import Task
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Effects exposing (Effects, Never)
+import Http
 import Rails
-import Util exposing ((=>))
-import Component.Util exposing (encodeBody)
+
+import Localdoc.Util exposing ((=>))
 import Localdoc.Model exposing (Model, DocSection, SaveState(..))
 
 
@@ -104,6 +105,10 @@ updateDoc model sectionIndex =
         jsonData =
             Encode.object
                 [ "sections" => Encode.list (List.map encodeSection model.sections) ]
+
+        encodeBody jsonData =
+            Http.string (Encode.encode 0 jsonData)
+
 
         url =
             updateDocPath model

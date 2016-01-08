@@ -8,11 +8,11 @@ import StartApp
 import StartApp.FromResult
 import Signal.Time exposing (settledAfter)
 
-import Util exposing ((=>))
 import Localdoc.Model exposing (Model)
 import Localdoc.Model.Decoder as ModelDecoder
 import Localdoc.View exposing (view)
 import Localdoc.Update exposing (Action(..), Addresses, update)
+import Localdoc.Util exposing ((=>))
 
 
 port modelJson : Value

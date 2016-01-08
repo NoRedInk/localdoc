@@ -22,6 +22,7 @@ module Localdoc
     private
 
     def doc_root
+      fail "Set `Localdoc.document_root` to your documents directory." if Localdoc.document_root.nil?
       @doc_root ||= Pathname.new Rails.root.join(Localdoc.document_root)
     end
 
@@ -37,7 +38,7 @@ module Localdoc
       return [] if doc_content.blank?
       case params[:format]
       when "mermaid"
-        mermaid_sections
+        mermaid_sections doc_content
       else
         [
           {title: "", format: params[:format], content: doc_content}

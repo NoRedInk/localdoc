@@ -1,9 +1,9 @@
 module Localdoc.Model.Decoder where
 
 import Json.Decode exposing (..)
-import Util.Decoder.Extra exposing ((|:))
 
 import Localdoc.Model exposing (Model, DocTree(..), DocTreeNode, DocSection, Format(..), SaveState(Idle))
+import Localdoc.Util exposing ((|:))
 
 
 model : Decoder Model

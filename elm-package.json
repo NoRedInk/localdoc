@@ -1,0 +1,23 @@
+{
+  "version": "1.0.0",
+  "summary": "localdoc Elm code",
+  "repository": "https://github.com/NoRedInk/localdoc.git",
+  "license": "BSD-3-Clause",
+  "source-directories": [
+    "./app/frontend/elm/"
+  ],
+  "exposed-modules": [],
+  "native-modules": true,
+  "dependencies": {
+    "Apanatshka/elm-signal-extra": "5.7.0 <= v <= 5.7.0",
+    "NoRedInk/elm-rails": "3.0.0 <= v <= 3.0.0",
+    "circuithub/elm-json-extra": "2.2.1 <= v <= 2.2.1",
+    "elm-lang/core": "3.0.0 <= v <= 3.0.0",
+    "evancz/elm-effects": "2.0.1 <= v <= 2.0.1",
+    "evancz/elm-html": "4.0.2 <= v <= 4.0.2",
+    "evancz/elm-http": "3.0.0 <= v <= 3.0.0",
+    "evancz/elm-markdown": "2.0.0 <= v <= 2.0.0",
+    "evancz/start-app": "2.0.2 <= v <= 2.0.2"
+  },
+  "elm-version": "0.16.0 <= v <= 0.16.0"
+}

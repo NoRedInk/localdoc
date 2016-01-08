@@ -4,14 +4,13 @@ import String
 import Signal exposing (Address)
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events exposing (on, targetValue, onClick)
 import Markdown as MarkdownParser
 import Mermaid
 
-import Util exposing ((=>))
-import Component.Util exposing (onInput, noOpHref)
 import Localdoc.Update exposing (Action(..))
 import Localdoc.Model exposing (Model, DocTree(..), DocTreeNode, DocSection, Format(..))
+import Localdoc.Util exposing ((=>))
 
 
 view : Address Action -> Model -> Html
@@ -189,6 +188,9 @@ viewMermaidContent address sectionIndex section =
         diagram =
             Mermaid.toHtml section.content
 
+        onInput address contentToValue =
+            on "input" targetValue (\str -> Signal.message address (contentToValue str))
+
         editor =
             div
               [ classList
@@ -213,7 +215,7 @@ viewMermaidContent address sectionIndex section =
     in
         [ diagram
         , a
-          [ noOpHref
+          [ href "javascript:void(0)"
           , onClick address (ToggleSectionEditing sectionIndex)
           ]
           [ text toggleText ]

@@ -1,5 +1,5 @@
 Localdoc::Engine.routes.draw do
-  root to: "applicaiton#show"
+  root to: "application#show"
   get "(*path)", to: "application#show", as: "show"
   put "*path", to: :"application#update"
 end

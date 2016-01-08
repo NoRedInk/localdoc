@@ -1,0 +1,23 @@
+{
+  "name": "localdoc-frontend",
+  "version": "1.0.0",
+  "description": "Plaintext documentation browser",
+  "author": "NoRedInk",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/NoRedInk/localdoc/issues"
+  },
+  "homepage": "https://github.com/NoRedInk/localdoc#readme",
+  "devDependencies": {
+    "babel-core": "^6.2.1",
+    "babel-loader": "^6.2.0",
+    "coffee-loader": "^0.7.2",
+    "coffee-script": "^1.10.0",
+    "elm-webpack-loader": "git+https://github.com/rtfeldman/elm-webpack-loader.git",
+    "expose-loader": "~0.6.0",
+    "jquery": "^2.1.4",
+    "lodash": "^3.10.1",
+    "marked": "^0.3.5",
+    "webpack": "1.12.4"
+  }
+}
