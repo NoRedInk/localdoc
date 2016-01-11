@@ -1,5 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
+const neat = require("node-neat");
+const sassPaths = neat.with([
+    path.resolve(__dirname, "./app/frontend/sass")
+  ]).map(function(sassPath) {
+  return "includePaths[]=" + sassPath;
+}).join("&");
 
 const loaderConfigs = [
   {
@@ -11,18 +17,23 @@ const loaderConfigs = [
     exclude: [/elm-stuff/, /node_modules/],
     loader: 'elm-webpack'
   },
+  {
+    test: /\.sass$/,
+    loader: "style!css?sourceMap!sass?indentedSyntax&sourceMap&" + sassPaths,
+  },
 ];
 
 const sourceRoot = path.join(__dirname, 'app', 'frontend');
 
 const sources = {
-  js: path.join(sourceRoot, 'javascripts'),
+  coffee: path.join(sourceRoot, 'coffee'),
   elm: path.join(sourceRoot, 'elm'),
+  sass: path.join(sourceRoot, 'sass'),
 };
 
 module.exports = {
   context: sourceRoot,
-  entry: './javascripts/localdoc/entry.js',
+  entry: './localdoc.js',
   output: {
     path: path.join(__dirname, 'app', 'assets', 'javascripts'),
     filename: 'localdoc/bundle.js',
@@ -31,19 +42,18 @@ module.exports = {
     devtoolFallbackModuleFilenameTemplate: '[resourcePath]?[hash]'
   },
   resolve: {
-    alias: {
-      coffee: sources.js
-    },
     root: [
-      sources.js,
-      sources.elm
+      sources.coffee,
+      sources.elm,
+      sources.sass,
     ],
-    extensions: ['', '.js', '.coffee', '.elm'],
+    extensions: ['', '.js', '.coffee', '.elm', '.sass', '.scss'],
     modulesDirectories: ['node_modules']
   },
-  plugins: [],
+  plugins: [
+  ],
   module: {
     loaders: loaderConfigs,
-    noParse: /.elm/
+    noParse: /\.elm$/
   }
 };

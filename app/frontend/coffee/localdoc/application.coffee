@@ -1,3 +1,5 @@
+require "localdoc/application.sass"
+
 Elm = require "Localdoc/API"
 $ = require "jquery"
 
