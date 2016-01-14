@@ -7,7 +7,7 @@ module Localdoc
   class Engine < ::Rails::Engine
     isolate_namespace Localdoc
 
-    initializer "localdoc.assets.configue" do |app|
+    initializer "localdoc.assets.configure" do |app|
       app.config.assets.configure do |env|
         env.unregister_postprocessor 'application/javascript', Sprockets::SafetyColons
       end
