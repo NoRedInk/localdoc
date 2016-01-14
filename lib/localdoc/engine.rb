@@ -2,8 +2,6 @@ require "rubygems"
 require "rails"
 require "action_view"
 require "haml"
-require "bourbon"
-require "neat"
 
 module Localdoc
   class Engine < ::Rails::Engine
@@ -16,7 +14,7 @@ module Localdoc
     end
 
     initializer "localdoc.assets.precompile" do |app|
-      app.config.assets.precompile += %w(localdoc/application.css localdoc/bundle.js)
+      app.config.assets.precompile += %w(localdoc/bundle.js)
     end
   end
 end
