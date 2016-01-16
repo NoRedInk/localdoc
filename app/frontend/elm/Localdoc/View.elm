@@ -9,7 +9,7 @@ import Html.Raw
 import Markdown
 
 import Localdoc.Update exposing (Action(..))
-import Localdoc.Model exposing (Model, DocTree(..), DocTreeNode, DocSection, Format(..))
+import Localdoc.Model exposing (Model, DocTree(..), DocTreeNode, DocSection)
 import Localdoc.Util exposing ((=>))
 
 
@@ -104,11 +104,6 @@ viewSections address sections =
             List.indexedMap (viewSection address) sections
                 |> List.concat
 
-        sectionIsEditable section =
-            case section.format of
-                Mermaid -> True
-                _ -> False
-
         editHelps =
             [ "Editing a section title and adding new sections aren't supported: edit the doc directly with your editor."
             , "[Mermaid syntax](http://knsv.github.io/mermaid/index.html#flowcharts-basic-syntax)"
@@ -117,16 +112,13 @@ viewSections address sections =
             |> List.map (\help -> li [] [ help ])
 
         docFooter =
-            if List.any sectionIsEditable sections then
-                [ footer
-                  [ class "doc-footer" ]
-                  [ ul
-                    [ class "doc-footer-helps" ]
-                    editHelps
-                  ]
-                ]
-            else
-                []
+            [ footer
+              [ class "doc-footer" ]
+              [ ul
+                [ class "doc-footer-helps" ]
+                editHelps
+              ]
+            ]
     in
         body ++ docFooter
 
@@ -142,8 +134,8 @@ viewSection address sectionIndex docSection =
         content =
             viewSectionContent address sectionIndex docSection
 
-        formatSpecificClass =
-            toString docSection.format
+        extensionSpecificClass =
+            toString docSection.extension
                 |> String.toLower
                 |> (++) "doc-section-content-"
     in
@@ -151,7 +143,7 @@ viewSection address sectionIndex docSection =
         , div
             [ classList
                 [ "doc-section-content" => True
-                , formatSpecificClass => True
+                , extensionSpecificClass => True
                 ]
             ]
             content
@@ -176,7 +168,7 @@ viewSectionContent address sectionIndex section =
               ]
               [ textarea
                 [ class "doc-section-editor-content"
-                , onInput address (HandleSectionContentInput sectionIndex section.format) ]
+                , onInput address (HandleSectionContentInput sectionIndex section.extension) ]
                 [ text section.rawContent ]
               , footer
                 [ class "doc-section-editor-footer" ]

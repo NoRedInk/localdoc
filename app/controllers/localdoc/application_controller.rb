@@ -2,11 +2,15 @@ module Localdoc
   class ApplicationController < ActionController::Base
     def show
       doc_content, blocking_error = read_doc
-      @page_data = {
+      model = {
         allDocs: all_docs,
         path: doc_relative_path.to_s,
         sections: sections(doc_content),
         blockingError: blocking_error,
+      }
+      @page_data = {
+        model: model,
+        markdownOptions: Localdoc.markdown_options,
       }
       render formats: :html
     end
@@ -36,33 +40,9 @@ module Localdoc
 
     def sections(doc_content)
       return [] if doc_content.blank?
-      case params[:format]
-      when "mermaid"
-        mermaid_sections doc_content
-      else
-        [
-          {title: "", format: params[:format], rawContent: doc_content}
-        ]
-      end
-    end
-
-    def mermaid_sections(doc_content)
-      sections = doc_content.each_line.lazy.each_with_object([]) do |line,memo|
-        if line =~ /^%%/
-          memo.push mermaid_section(line.strip)
-        else
-          memo.push mermaid_section("") if memo.empty?
-          memo[-1][:rawContent].push(line)
-        end
-        memo
-      end
-      sections.each do |section|
-        section[:rawContent] = section[:rawContent].join("").strip
-      end
-    end
-
-    def mermaid_section(title)
-      {title: title, format: "mermaid", rawContent: []}
+      [
+        {title: "", extension: params[:format], rawContent: doc_content}
+      ]
     end
 
     # update

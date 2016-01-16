@@ -13,9 +13,17 @@ const loaderConfigs = [
     loader: 'coffee-loader'
   },
   {
+    test: /\.json$/,
+    loader: 'json-loader'
+  },
+  {
     test: /\.elm$/,
     exclude: [/elm-stuff/, /node_modules/],
     loader: 'elm-webpack'
+  },
+  {
+    test: /\.css$/,
+    loader: "style!css?sourceMap",
   },
   {
     test: /\.sass$/,
@@ -54,6 +62,9 @@ module.exports = {
   ],
   module: {
     loaders: loaderConfigs,
-    noParse: /\.elm$/
+    noParse: [
+        /\.elm$/,
+        /mermaid\/dist\/www\/javascripts\/lib\/mermaid.js/
+    ]
   }
 };

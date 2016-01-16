@@ -8,7 +8,7 @@ import StartApp
 import StartApp.FromResult
 import Signal.Time exposing (settledAfter)
 
-import Localdoc.Model exposing (Model, Format(Markdown))
+import Localdoc.Model exposing (Model)
 import Localdoc.Model.Decoder as ModelDecoder
 import Localdoc.View exposing (view)
 import Localdoc.Update exposing (Action(..), Addresses, update)
@@ -30,7 +30,7 @@ app =
         toModelEffects model =
             let
                 renderSection sectionIndex section =
-                    Signal.send addresses.renderContent (sectionIndex, section.format, section.rawContent)
+                    Signal.send addresses.renderContent (sectionIndex, section.extension, section.rawContent)
                           |> Task.map (always NoOp)
                           |> Effects.task
 
@@ -68,28 +68,22 @@ port tasks =
     app.tasks
 
 
-{-| Signal for (sectionIndex, format, rawContent).
+{-| Signal for (sectionIndex, extension, rawContent).
 JavaScript side should render rawContent as HTML and
 send it to the `renderedContent` port.
 -}
 port renderContent : Signal (Int, String, String)
 port renderContent =
-    let
-        mapper : (Int, Format, String) -> (Int, String, String)
-        mapper (sectionIndex, format, content) =
-            (sectionIndex, (toString format), content)
-    in
-      renderContentMailbox.signal
-          |> Signal.map mapper
+    renderContentMailbox.signal
 
 
-renderContentMailbox : Signal.Mailbox (Int, Format, String)
+renderContentMailbox : Signal.Mailbox (Int, String, String)
 renderContentMailbox =
-    Signal.mailbox (-1, Markdown, "")
+    Signal.mailbox (-1, "", "")
 
 
 {-| Mailbox for routing user input through `settledAfter`.
 -}
-sectionContentInputMailbox : Signal.Mailbox (Int, Format, String)
+sectionContentInputMailbox : Signal.Mailbox (Int, String, String)
 sectionContentInputMailbox =
-    Signal.mailbox (-1, Markdown, "")
+    Signal.mailbox (-1, "", "")

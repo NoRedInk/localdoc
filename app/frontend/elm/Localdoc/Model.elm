@@ -23,18 +23,12 @@ type DocTree =
 
 type alias DocSection =
     { title : String
-    , format : Format
+    , extension : String
     , rawContent : String
     , renderedContent : String
     , editing : Bool
     , saveState : SaveState
     }
-
-
-type Format
-    = Mermaid
-    | Json
-    | Markdown
 
 
 type SaveState

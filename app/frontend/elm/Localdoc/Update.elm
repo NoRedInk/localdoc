@@ -9,21 +9,21 @@ import Http
 import Rails
 
 import Localdoc.Util exposing ((=>))
-import Localdoc.Model exposing (Model, DocSection, Format, SaveState(..))
+import Localdoc.Model exposing (Model, DocSection, SaveState(..))
 
 
 type Action
     = NoOp
-    | HandleSectionContentInput Int Format String
-    | UpdateSectionContent (Int, Format, String)
+    | HandleSectionContentInput Int String String
+    | UpdateSectionContent (Int, String, String)
     | SaveSectionResponse Int (Result (Rails.Error ()) ())
     | ToggleSectionEditing Int
     | RenderedContent (Int, String)
 
 
 type alias Addresses =
-    { sectionContentInput : Signal.Address (Int, Format, String)
-    , renderContent : Signal.Address (Int, Format, String)
+    { sectionContentInput : Signal.Address (Int, String, String)
+    , renderContent : Signal.Address (Int, String, String)
     }
 
 
@@ -117,7 +117,7 @@ saveDoc model sectionIndex =
         encodeSection section =
             Encode.object
                 [ "title" => Encode.string section.title
-                , "format" => Encode.string (toString section.format)
+                , "extension" => Encode.string (toString section.extension)
                 , "content" => Encode.string section.rawContent
                 ]
 

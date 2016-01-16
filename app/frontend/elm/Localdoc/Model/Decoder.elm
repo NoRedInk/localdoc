@@ -2,7 +2,7 @@ module Localdoc.Model.Decoder where
 
 import Json.Decode exposing (..)
 
-import Localdoc.Model exposing (Model, DocTree(..), DocTreeNode, DocSection, Format(..), SaveState(Idle))
+import Localdoc.Model exposing (Model, DocTree(..), DocTreeNode, DocSection, SaveState(Idle))
 import Localdoc.Util exposing ((|:))
 
 
@@ -33,7 +33,7 @@ docSection : Decoder DocSection
 docSection =
     succeed DocSection
         |: ("title" := string)
-        |: ("format" := format)
+        |: ("extension" := string)
         |: ("rawContent" := string)
         |: (succeed initialRenderedContent)
         |: (succeed False)
@@ -43,23 +43,6 @@ docSection =
 initialRenderedContent : String
 initialRenderedContent =
     "rendering..."
-
-
-format : Decoder Format
-format =
-    let
-        formatFromString str =
-            case str of
-                "mermaid" ->
-                    succeed Mermaid
-                "json" ->
-                    succeed Json
-                "md" ->
-                    succeed Markdown
-                _ ->
-                    succeed Markdown
-    in
-        string `andThen` formatFromString
 
 
 lazy : (() -> Decoder a) -> Decoder a
