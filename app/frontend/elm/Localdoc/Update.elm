@@ -9,21 +9,21 @@ import Http
 import Rails
 
 import Localdoc.Util exposing ((=>))
-import Localdoc.Model exposing (Model, DocSection, SaveState(..))
+import Localdoc.Model exposing (Model, SaveState(..))
 
 
 type Action
     = NoOp
-    | HandleSectionContentInput Int String String
-    | UpdateSectionContent (Int, String, String)
-    | SaveSectionResponse Int (Result (Rails.Error ()) ())
-    | ToggleSectionEditing Int
-    | RenderedContent (Int, String)
+    | HandleRawContentInput String String
+    | UpdateRawContent (String, String)
+    | SaveResponse (Result (Rails.Error ()) ())
+    | ToggleEditing
+    | RenderedContent String
 
 
 type alias Addresses =
-    { sectionContentInput : Signal.Address (Int, String, String)
-    , renderContent : Signal.Address (Int, String, String)
+    { rawContentInput : Signal.Address (String, String)
+    , renderContent : Signal.Address (String, String)
     }
 
 
@@ -33,97 +33,57 @@ update addresses action model =
         NoOp ->
             model => Effects.none
 
-        HandleSectionContentInput sectionIndex format content ->
+        HandleRawContentInput extension content ->
             let
                 task =
-                    Signal.send addresses.sectionContentInput (sectionIndex, format, content)
+                    Signal.send addresses.rawContentInput (extension, content)
                         |> Task.map (always NoOp)
             in
                 model => Effects.task task
 
-        UpdateSectionContent (sectionIndex, format, content) ->
+        UpdateRawContent (extension, content) ->
             let
-                updateSection section =
-                    { section
-                         | rawContent = content
-                         , saveState = Saving
-                    }
-
-                newModel =
-                    updateModelSection updateSection sectionIndex model
-
                 effects =
-                    [ (saveDoc model sectionIndex)
-                    , (Signal.send addresses.renderContent (sectionIndex, format, content))
+                    [ (saveDoc model)
+                    , (Signal.send addresses.renderContent (extension, content))
                         |> Task.map (always NoOp)
                     ]
                         |> List.map Effects.task
             in
-                newModel => Effects.batch effects
+              { model
+                  | rawContent = content
+                  , saveState = Saving
+              } => Effects.batch effects
 
-        SaveSectionResponse sectionIndex railsResponse ->
+        SaveResponse railsResponse ->
             let
                 saveState =
                     case railsResponse of
                         Ok _ -> Saved
                         Err _ -> SaveError
-
-                updater section =
-                    { section | saveState = saveState }
-
-                newModel =
-                    updateModelSection updater sectionIndex model
             in
-                newModel => Effects.none
+              { model
+                    | saveState = saveState
+              } => Effects.none
 
-        ToggleSectionEditing sectionIndex ->
-            let
-                updater section =
-                    { section | editing = not section.editing }
+        ToggleEditing ->
+            { model
+                  | editing = not model.editing
+            } => Effects.none
 
-                newModel =
-                    updateModelSection updater sectionIndex model
-            in
-                newModel => Effects.none
+        RenderedContent content ->
+            { model
+                  | renderedContent = content
+            } => Effects.none
 
-        RenderedContent (sectionIndex, content) ->
-            let
-                updater section =
-                    { section | renderedContent = content }
-
-                newModel =
-                    updateModelSection updater sectionIndex model
-            in
-                newModel => Effects.none
-
-
-updateModelSection : (DocSection -> DocSection) -> Int -> Model -> Model
-updateModelSection updater sectionIndex model =
+saveDoc : Model -> Task.Task Never Action
+saveDoc model =
     let
-        eachSection thisIndex section =
-            if thisIndex == sectionIndex then
-                updater section
-            else
-                section
-    in
-        { model
-             | sections = List.indexedMap eachSection model.sections
-        }
-
-
-saveDoc : Model -> Int -> Task.Task Never Action
-saveDoc model sectionIndex =
-    let
-        encodeSection section =
-            Encode.object
-                [ "title" => Encode.string section.title
-                , "extension" => Encode.string (toString section.extension)
-                , "content" => Encode.string section.rawContent
-                ]
-
         jsonData =
             Encode.object
-                [ "sections" => Encode.list (List.map encodeSection model.sections) ]
+                [ "extension" => Encode.string (toString model.extension)
+                , "rawContent" => Encode.string model.rawContent
+                ]
 
         encodeBody jsonData =
             Http.string (Encode.encode 0 jsonData)
@@ -131,4 +91,4 @@ saveDoc model sectionIndex =
         Rails.send model.authToken "PUT" model.savePath (encodeBody jsonData)
             |> Rails.fromJson (Rails.always (Decode.succeed ()))
             |> Task.toResult
-            |> Task.map (SaveSectionResponse sectionIndex)
+            |> Task.map SaveResponse

@@ -7,7 +7,11 @@ type alias Model =
     , filePath : String
     , savePath : String
     , editable : Bool
-    , sections : List DocSection
+    , extension : String
+    , rawContent : String
+    , renderedContent : String
+    , editing : Bool
+    , saveState : SaveState
     , blockingError : Maybe String
     }
 
@@ -21,16 +25,6 @@ type alias DocTreeNode =
 
 type DocTree =
     DocTree (List DocTreeNode)
-
-
-type alias DocSection =
-    { title : String
-    , extension : String
-    , rawContent : String
-    , renderedContent : String
-    , editing : Bool
-    , saveState : SaveState
-    }
 
 
 type SaveState

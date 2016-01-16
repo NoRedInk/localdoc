@@ -9,7 +9,7 @@ import Html.Raw
 import Markdown
 
 import Localdoc.Update exposing (Action(..))
-import Localdoc.Model exposing (Model, DocTree(..), DocTreeNode, DocSection)
+import Localdoc.Model exposing (Model, DocTree(..), DocTreeNode)
 import Localdoc.Util exposing ((=>))
 
 
@@ -90,115 +90,109 @@ viewDoc address model =
                     [ p [ class "blocking-error" ] [ text error ] ]
 
                 Nothing ->
-                    viewSections address model.editable model.sections
+                    viewDocument address model
     in
         article
           [ class "doc" ]
           (header ++ content)
 
 
-viewSections : Address Action -> Bool -> List DocSection -> List Html
-viewSections address editable sections =
+viewDocument : Address Action -> Model -> List Html
+viewDocument address model =
     let
         body =
-            List.indexedMap (viewSection address editable) sections
-                |> List.concat
-
-        editHelps =
-            [ "Editing a section title and adding new sections aren't supported: edit the doc directly with your editor."
-            , "[Mermaid syntax](http://knsv.github.io/mermaid/index.html#flowcharts-basic-syntax)"
-            ]
-            |> List.map Markdown.toHtml
-            |> List.map (\help -> li [] [ help ])
+            viewBody address model
 
         docFooter =
-            [ footer
+            footer
               [ class "doc-footer" ]
               [ ul
                 [ class "doc-footer-helps" ]
                 editHelps
               ]
-            ]
     in
-        body ++ docFooter
-
-
-viewSection : Address Action -> Bool -> Int -> DocSection -> List Html
-viewSection address editable sectionIndex docSection =
-    let
-        header =
-            h2
-              [ class "doc-section-title" ]
-              [ text docSection.title ]
-
-        content =
-            viewSectionContent address editable sectionIndex docSection
-
-        extensionSpecificClass =
-            toString docSection.extension
-                |> String.toLower
-                |> (++) "doc-section-content-"
-    in
-        [ header
-        , div
-            [ classList
-                [ "doc-section-content" => True
-                , extensionSpecificClass => True
-                ]
-            ]
-            content
+        [ body
+        , docFooter
         ]
 
 
-viewSectionContent : Address Action -> Bool -> Int -> DocSection -> List Html
-viewSectionContent address editable sectionIndex section =
+editHelps : List Html
+editHelps =
+    [ "Editing a section title and adding new sections aren't supported: edit the doc directly with your editor."
+    , "[Mermaid syntax](http://knsv.github.io/mermaid/index.html#flowcharts-basic-syntax)"
+    ]
+          |> List.map Markdown.toHtml
+          |> List.map (\help -> li [] [ help ])
+
+
+viewBody : Address Action -> Model -> Html
+viewBody address model =
     let
-        content =
-            Html.Raw.toHtml section.renderedContent
+        extensionSpecificClass =
+            toString model.extension
+                |> String.toLower
+                |> (++) "doc-body-"
 
-        onInput address contentToValue =
-            on "input" targetValue (\str -> Signal.message address (contentToValue str))
+    in
+        div
+          [ classList
+            [ "doc-body" => True
+            , extensionSpecificClass => True
+            ]
+          ]
+          [ viewRendered model
+          , viewEditLink address model
+          , viewEditor address model
+          ]
 
-        editor =
-            div
-              [ classList
-                [ "doc-section-editor" => True
-                , "editing" => section.editing
-                ]
-              ]
-              [ textarea
-                [ class "doc-section-editor-content"
-                , onInput address (HandleSectionContentInput sectionIndex section.extension) ]
-                [ text section.rawContent ]
-              , footer
-                [ class "doc-section-editor-footer" ]
-                [ text (toString section.saveState) ]
-              ]
+viewRendered : Model -> Html
+viewRendered model =
+    Html.Raw.toHtml model.renderedContent
 
+
+viewEditLink : Address Action -> Model -> Html
+viewEditLink address model =
+    let
         toggleText =
-            if section.editing then
+            if model.editing then
                 "done"
             else
                 "edit"
-
-        editLink =
-            if editable then
-                a
-                  [ class "doc-edit-link"
-                  , href "javascript:void(0)"
-                  , onClick address (ToggleSectionEditing sectionIndex)
-                  ]
-                  [ text toggleText ]
-            else
-                span
-                  [ classList
-                    [ "doc-edit-link" => True
-                    , "disabled" => True
-                    ]
-                  ]
-                  [ text "(you can edit only in development)" ]
     in
-        [ content
-        , editLink
-        , editor
-        ]
+      if model.editable then
+          a
+          [ class "doc-edit-link"
+          , href "javascript:void(0)"
+          , onClick address ToggleEditing
+          ]
+          [ text toggleText ]
+      else
+          span
+          [ classList
+            [ "doc-edit-link" => True
+            , "disabled" => True
+            ]
+          ]
+          [ text "(you can edit only in development)" ]
+
+
+viewEditor : Address Action -> Model -> Html
+viewEditor address model =
+    let
+        onInput address contentToValue =
+            on "input" targetValue (\str -> Signal.message address (contentToValue str))
+    in
+        div
+          [ classList
+            [ "doc-editor" => True
+            , "editing" => model.editing
+            ]
+          ]
+          [ textarea
+            [ class "doc-editor-content"
+            , onInput address (HandleRawContentInput model.extension) ]
+            [ text model.rawContent ]
+          , footer
+            [ class "doc-section-editor-footer" ]
+            [ text (toString model.saveState) ]
+          ]

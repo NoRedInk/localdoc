@@ -16,7 +16,7 @@ import Localdoc.Util exposing ((=>))
 
 
 port modelJson : Value
-port renderedContent : Signal (Int, String)
+port renderedContent : Signal String
 
 
 app : StartApp.App (Result String Model)
@@ -29,19 +29,15 @@ app =
 
         toModelEffects model =
             let
-                renderSection sectionIndex section =
-                    Signal.send addresses.renderContent (sectionIndex, section.extension, section.rawContent)
+                effects =
+                    Signal.send addresses.renderContent (model.extension, model.rawContent)
                           |> Task.map (always NoOp)
                           |> Effects.task
-
-                effects =
-                    model.sections
-                         |> List.indexedMap renderSection
             in
-              model => (Effects.batch effects)
+                model => effects
 
         addresses =
-            { sectionContentInput = sectionContentInputMailbox.address
+            { rawContentInput = contentInputMailbox.address
             , renderContent = renderContentMailbox.address
             }
     in
@@ -51,8 +47,8 @@ app =
             , viewSuccess = view
             , viewError = (\error -> div [] [text error])
             , inputs =
-              [ settledAfter 200 sectionContentInputMailbox.signal
-                  |> Signal.map UpdateSectionContent
+              [ settledAfter 200 contentInputMailbox.signal
+                  |> Signal.map UpdateRawContent
               , renderedContent
                   |> Signal.map RenderedContent
               ]
@@ -68,22 +64,22 @@ port tasks =
     app.tasks
 
 
-{-| Signal for (sectionIndex, extension, rawContent).
+{-| Signal for (extension, rawContent).
 JavaScript side should render rawContent as HTML and
 send it to the `renderedContent` port.
 -}
-port renderContent : Signal (Int, String, String)
+port renderContent : Signal (String, String)
 port renderContent =
     renderContentMailbox.signal
 
 
-renderContentMailbox : Signal.Mailbox (Int, String, String)
+renderContentMailbox : Signal.Mailbox (String, String)
 renderContentMailbox =
-    Signal.mailbox (-1, "", "")
+    Signal.mailbox ("", "")
 
 
 {-| Mailbox for routing user input through `settledAfter`.
 -}
-sectionContentInputMailbox : Signal.Mailbox (Int, String, String)
-sectionContentInputMailbox =
-    Signal.mailbox (-1, "", "")
+contentInputMailbox : Signal.Mailbox (String, String)
+contentInputMailbox =
+    Signal.mailbox ("", "")

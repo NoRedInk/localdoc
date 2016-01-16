@@ -11,11 +11,11 @@ $ ->
 
   app = Elm.embed Elm.Localdoc.API, document.getElementById("elm-host"),
     modelJson: pageData.model
-    renderedContent: [-1, ""]
+    renderedContent: ""
 
   md = markdown(pageData.markdownOptions)
 
-  app.ports.renderContent.subscribe ([sectionIndex, extension, content]) ->
+  app.ports.renderContent.subscribe ([extension, content]) ->
       extension = extension.toLowerCase()
       format = extensionFormatMap[extension] || extension
       # Render all formats through markdown for now.
@@ -23,4 +23,4 @@ $ ->
           content = require("./format/raw")(content, extension)
       rendered = md.render(content)
 
-      app.ports.renderedContent.send [sectionIndex, rendered]
+      app.ports.renderedContent.send rendered

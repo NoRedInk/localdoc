@@ -1,15 +1,14 @@
 module Localdoc
   class ApplicationController < ActionController::Base
     def show
-      doc_content, blocking_error = read_doc
+      document, blocking_error = read_doc
       model = {
         allDocs: all_docs,
         filePath: doc_relative_path.to_s,
         savePath: update_path(path: doc_relative_path.to_s),
         editable: editable?,
-        sections: sections(doc_content),
         blockingError: blocking_error,
-      }
+      }.merge(document)
       @page_data = {
         model: model,
         markdownOptions: Localdoc.markdown_options,
@@ -19,7 +18,7 @@ module Localdoc
 
     def update
       File.open(doc_full_path, 'w') do |f|
-        f.write serialize_sections
+        f.write params[:rawContent]
       end
 
       render json: {}
@@ -40,21 +39,6 @@ module Localdoc
       @doc_full_path ||= doc_root + doc_relative_path
     end
 
-    def sections(doc_content)
-      return [] if doc_content.blank?
-      [
-        {title: "", extension: params[:format], rawContent: doc_content}
-      ]
-    end
-
-    # update
-
-    def serialize_sections
-      params[:sections].map do |section|
-        section[:title] + "\n\n" + section[:rawContent]
-      end.join("\n\n")
-    end
-
     # readers
 
     def all_docs
@@ -65,11 +49,12 @@ module Localdoc
       if params[:path].blank?
         blocking_error = 'Pick a document to view and maybe edit.'
       elsif File.exist? doc_full_path
-        doc = File.read doc_full_path
+        content = File.read doc_full_path
       else
         blocking_error = 'File Not Found'
       end
-      [doc, blocking_error]
+      document = {extension: params[:format], rawContent: content}
+      [document, blocking_error]
     end
 
     # reader helpers

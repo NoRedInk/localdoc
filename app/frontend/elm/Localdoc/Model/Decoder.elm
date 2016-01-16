@@ -2,7 +2,7 @@ module Localdoc.Model.Decoder where
 
 import Json.Decode exposing (..)
 
-import Localdoc.Model exposing (Model, DocTree(..), DocTreeNode, DocSection, SaveState(Idle))
+import Localdoc.Model exposing (Model, DocTree(..), DocTreeNode, SaveState(Idle))
 import Localdoc.Util exposing ((|:))
 
 
@@ -14,8 +14,17 @@ model =
         |: ("filePath" := string)
         |: ("savePath" := string)
         |: ("editable" := bool)
-        |: ("sections" := list docSection)
+        |: ("extension" := string)
+        |: ("rawContent" := string)
+        |: (succeed initialRenderedContent)
+        |: (succeed False)
+        |: (succeed Idle)
         |: ("blockingError" := maybe string)
+
+
+initialRenderedContent : String
+initialRenderedContent =
+    "rendering..."
 
 
 docTree : Decoder DocTree
@@ -29,22 +38,6 @@ docTreeNode =
         |: ("name" := string)
         |: ("url" := string)
         |: ("children" := docTree)
-
-
-docSection : Decoder DocSection
-docSection =
-    succeed DocSection
-        |: ("title" := string)
-        |: ("extension" := string)
-        |: ("rawContent" := string)
-        |: (succeed initialRenderedContent)
-        |: (succeed False)
-        |: (succeed Idle)
-
-
-initialRenderedContent : String
-initialRenderedContent =
-    "rendering..."
 
 
 lazy : (() -> Decoder a) -> Decoder a
