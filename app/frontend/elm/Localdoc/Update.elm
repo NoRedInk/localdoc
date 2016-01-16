@@ -9,19 +9,21 @@ import Http
 import Rails
 
 import Localdoc.Util exposing ((=>))
-import Localdoc.Model exposing (Model, DocSection, SaveState(..))
+import Localdoc.Model exposing (Model, DocSection, Format, SaveState(..))
 
 
 type Action
     = NoOp
-    | HandleSectionContentInput Int String
-    | UpdateSectionContent (Int, String)
+    | HandleSectionContentInput Int Format String
+    | UpdateSectionContent (Int, Format, String)
     | SaveSectionResponse Int (Result (Rails.Error ()) ())
     | ToggleSectionEditing Int
+    | RenderedContent (Int, String)
 
 
 type alias Addresses =
-    { sectionContentInput : Signal.Address (Int, String)
+    { sectionContentInput : Signal.Address (Int, Format, String)
+    , renderContent : Signal.Address (Int, Format, String)
     }
 
 
@@ -31,15 +33,15 @@ update addresses action model =
         NoOp ->
             model => Effects.none
 
-        HandleSectionContentInput sectionIndex content ->
+        HandleSectionContentInput sectionIndex format content ->
             let
                 task =
-                    Signal.send addresses.sectionContentInput (sectionIndex, content)
+                    Signal.send addresses.sectionContentInput (sectionIndex, format, content)
                         |> Task.map (always NoOp)
             in
                 model => Effects.task task
 
-        UpdateSectionContent (sectionIndex, content) ->
+        UpdateSectionContent (sectionIndex, format, content) ->
             let
                 updateSection section =
                     { section
@@ -49,8 +51,15 @@ update addresses action model =
 
                 newModel =
                     updateModelSection updateSection sectionIndex model
+
+                effects =
+                    [ (saveDoc model sectionIndex)
+                    , (Signal.send addresses.renderContent (sectionIndex, format, content))
+                        |> Task.map (always NoOp)
+                    ]
+                        |> List.map Effects.task
             in
-                newModel => Effects.task (saveDoc model sectionIndex)
+                newModel => Effects.batch effects
 
         SaveSectionResponse sectionIndex railsResponse ->
             let
@@ -71,6 +80,16 @@ update addresses action model =
             let
                 updater section =
                     { section | editing = not section.editing }
+
+                newModel =
+                    updateModelSection updater sectionIndex model
+            in
+                newModel => Effects.none
+
+        RenderedContent (sectionIndex, content) ->
+            let
+                updater section =
+                    { section | renderedContent = content }
 
                 newModel =
                     updateModelSection updater sectionIndex model
@@ -99,7 +118,7 @@ saveDoc model sectionIndex =
             Encode.object
                 [ "title" => Encode.string section.title
                 , "format" => Encode.string (toString section.format)
-                , "content" => Encode.string section.content
+                , "content" => Encode.string section.rawContent
                 ]
 
         jsonData =

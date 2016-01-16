@@ -24,7 +24,8 @@ type DocTree =
 type alias DocSection =
     { title : String
     , format : Format
-    , content : String
+    , rawContent : String
+    , renderedContent : String
     , editing : Bool
     , saveState : SaveState
     }

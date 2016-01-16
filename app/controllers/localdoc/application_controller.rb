@@ -41,7 +41,7 @@ module Localdoc
         mermaid_sections doc_content
       else
         [
-          {title: "", format: params[:format], content: doc_content}
+          {title: "", format: params[:format], rawContent: doc_content}
         ]
       end
     end
@@ -52,24 +52,24 @@ module Localdoc
           memo.push mermaid_section(line.strip)
         else
           memo.push mermaid_section("") if memo.empty?
-          memo[-1][:content].push(line)
+          memo[-1][:rawContent].push(line)
         end
         memo
       end
       sections.each do |section|
-        section[:content] = section[:content].join("").strip
+        section[:rawContent] = section[:rawContent].join("").strip
       end
     end
 
     def mermaid_section(title)
-      {title: title, format: "mermaid", content: []}
+      {title: title, format: "mermaid", rawContent: []}
     end
 
     # update
 
     def serialize_sections
       params[:sections].map do |section|
-        section[:title] + "\n\n" + section[:content]
+        section[:title] + "\n\n" + section[:rawContent]
       end.join("\n\n")
     end
 

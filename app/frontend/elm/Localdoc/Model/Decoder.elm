@@ -34,9 +34,15 @@ docSection =
     succeed DocSection
         |: ("title" := string)
         |: ("format" := format)
-        |: ("content" := string)
+        |: ("rawContent" := string)
+        |: (succeed initialRenderedContent)
         |: (succeed False)
         |: (succeed Idle)
+
+
+initialRenderedContent : String
+initialRenderedContent =
+    "rendering..."
 
 
 format : Decoder Format

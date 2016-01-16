@@ -5,8 +5,8 @@ import Signal exposing (Address)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (on, targetValue, onClick)
-import Markdown as MarkdownParser
-import Mermaid
+import Html.Raw
+import Markdown
 
 import Localdoc.Update exposing (Action(..))
 import Localdoc.Model exposing (Model, DocTree(..), DocTreeNode, DocSection, Format(..))
@@ -113,7 +113,7 @@ viewSections address sections =
             [ "Editing a section title and adding new sections aren't supported: edit the doc directly with your editor."
             , "[Mermaid syntax](http://knsv.github.io/mermaid/index.html#flowcharts-basic-syntax)"
             ]
-            |> List.map MarkdownParser.toHtml
+            |> List.map Markdown.toHtml
             |> List.map (\help -> li [] [ help ])
 
         docFooter =
@@ -140,15 +140,7 @@ viewSection address sectionIndex docSection =
               [ text docSection.title ]
 
         content =
-            case docSection.format of
-                Json ->
-                    viewJsonContent docSection.content
-
-                Markdown ->
-                    viewMarkdownContent docSection.content
-
-                Mermaid ->
-                    viewMermaidContent address sectionIndex docSection
+            viewSectionContent address sectionIndex docSection
 
         formatSpecificClass =
             toString docSection.format
@@ -166,27 +158,11 @@ viewSection address sectionIndex docSection =
         ]
 
 
-viewJsonContent : String -> List Html
-viewJsonContent content =
-    [ pre
-      []
-      [ code
-        []
-        [ text content ]
-      ]
-    ]
-
-
-viewMarkdownContent : String -> List Html
-viewMarkdownContent content =
-    [ MarkdownParser.toHtml content ]
-
-
-viewMermaidContent : Address Action -> Int -> DocSection -> List Html
-viewMermaidContent address sectionIndex section =
+viewSectionContent : Address Action -> Int -> DocSection -> List Html
+viewSectionContent address sectionIndex section =
     let
-        diagram =
-            Mermaid.toHtml section.content
+        content =
+            Html.Raw.toHtml section.renderedContent
 
         onInput address contentToValue =
             on "input" targetValue (\str -> Signal.message address (contentToValue str))
@@ -200,8 +176,8 @@ viewMermaidContent address sectionIndex section =
               ]
               [ textarea
                 [ class "doc-section-editor-content"
-                , onInput address (HandleSectionContentInput sectionIndex) ]
-                [ text section.content ]
+                , onInput address (HandleSectionContentInput sectionIndex section.format) ]
+                [ text section.rawContent ]
               , footer
                 [ class "doc-section-editor-footer" ]
                 [ text (toString section.saveState) ]
@@ -213,7 +189,7 @@ viewMermaidContent address sectionIndex section =
             else
                 "edit"
     in
-        [ diagram
+        [ content
         , a
           [ href "javascript:void(0)"
           , onClick address (ToggleSectionEditing sectionIndex)
