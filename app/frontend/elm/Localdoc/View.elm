@@ -90,18 +90,18 @@ viewDoc address model =
                     [ p [ class "blocking-error" ] [ text error ] ]
 
                 Nothing ->
-                    viewSections address model.sections
+                    viewSections address model.editable model.sections
     in
         article
           [ class "doc" ]
           (header ++ content)
 
 
-viewSections : Address Action -> List DocSection -> List Html
-viewSections address sections =
+viewSections : Address Action -> Bool -> List DocSection -> List Html
+viewSections address editable sections =
     let
         body =
-            List.indexedMap (viewSection address) sections
+            List.indexedMap (viewSection address editable) sections
                 |> List.concat
 
         editHelps =
@@ -123,8 +123,8 @@ viewSections address sections =
         body ++ docFooter
 
 
-viewSection : Address Action -> Int -> DocSection -> List Html
-viewSection address sectionIndex docSection =
+viewSection : Address Action -> Bool -> Int -> DocSection -> List Html
+viewSection address editable sectionIndex docSection =
     let
         header =
             h2
@@ -132,7 +132,7 @@ viewSection address sectionIndex docSection =
               [ text docSection.title ]
 
         content =
-            viewSectionContent address sectionIndex docSection
+            viewSectionContent address editable sectionIndex docSection
 
         extensionSpecificClass =
             toString docSection.extension
@@ -150,8 +150,8 @@ viewSection address sectionIndex docSection =
         ]
 
 
-viewSectionContent : Address Action -> Int -> DocSection -> List Html
-viewSectionContent address sectionIndex section =
+viewSectionContent : Address Action -> Bool -> Int -> DocSection -> List Html
+viewSectionContent address editable sectionIndex section =
     let
         content =
             Html.Raw.toHtml section.renderedContent
@@ -180,12 +180,25 @@ viewSectionContent address sectionIndex section =
                 "done"
             else
                 "edit"
+
+        editLink =
+            if editable then
+                a
+                  [ class "doc-edit-link"
+                  , href "javascript:void(0)"
+                  , onClick address (ToggleSectionEditing sectionIndex)
+                  ]
+                  [ text toggleText ]
+            else
+                span
+                  [ classList
+                    [ "doc-edit-link" => True
+                    , "disabled" => True
+                    ]
+                  ]
+                  [ text "(you can edit only in development)" ]
     in
         [ content
-        , a
-          [ href "javascript:void(0)"
-          , onClick address (ToggleSectionEditing sectionIndex)
-          ]
-          [ text toggleText ]
+        , editLink
         , editor
         ]

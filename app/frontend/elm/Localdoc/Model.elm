@@ -6,6 +6,7 @@ type alias Model =
     , allDocs : DocTree
     , filePath : String
     , savePath : String
+    , editable : Bool
     , sections : List DocSection
     , blockingError : Maybe String
     }

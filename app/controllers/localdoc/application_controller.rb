@@ -6,6 +6,7 @@ module Localdoc
         allDocs: all_docs,
         filePath: doc_relative_path.to_s,
         savePath: update_path(path: doc_relative_path.to_s),
+        editable: editable?,
         sections: sections(doc_content),
         blockingError: blocking_error,
       }
@@ -93,6 +94,10 @@ module Localdoc
     def path_for_file(pathname, strip)
       stripped = strip.nil? ? pathname : pathname.relative_path_from(strip)
       show_path stripped
+    end
+
+    def editable?
+      Rails.env.development?
     end
   end
 end

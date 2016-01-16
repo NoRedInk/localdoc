@@ -13,6 +13,7 @@ model =
         |: ("allDocs" := docTree)
         |: ("filePath" := string)
         |: ("savePath" := string)
+        |: ("editable" := bool)
         |: ("sections" := list docSection)
         |: ("blockingError" := maybe string)
 
