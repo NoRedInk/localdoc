@@ -7,7 +7,7 @@ require "localdoc"
 
 module Dummy
   class Application < Rails::Application
-    Localdoc.document_root = ''
+    Localdoc.document_root = 'docs'
 
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
