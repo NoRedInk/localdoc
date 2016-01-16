@@ -16,7 +16,7 @@ type Action
     = NoOp
     | HandleSectionContentInput Int String
     | UpdateSectionContent (Int, String)
-    | UpdateSectionContentResponse Int (Result (Rails.Error ()) ())
+    | SaveSectionResponse Int (Result (Rails.Error ()) ())
     | ToggleSectionEditing Int
 
 
@@ -43,16 +43,16 @@ update addresses action model =
             let
                 updateSection section =
                     { section
-                         | content = content
+                         | rawContent = content
                          , saveState = Saving
                     }
 
                 newModel =
                     updateModelSection updateSection sectionIndex model
             in
-                newModel => Effects.task (updateDoc model sectionIndex)
+                newModel => Effects.task (saveDoc model sectionIndex)
 
-        UpdateSectionContentResponse sectionIndex railsResponse ->
+        SaveSectionResponse sectionIndex railsResponse ->
             let
                 saveState =
                     case railsResponse of
@@ -92,8 +92,8 @@ updateModelSection updater sectionIndex model =
         }
 
 
-updateDoc : Model -> Int -> Task.Task Never Action
-updateDoc model sectionIndex =
+saveDoc : Model -> Int -> Task.Task Never Action
+saveDoc model sectionIndex =
     let
         encodeSection section =
             Encode.object
@@ -111,15 +111,15 @@ updateDoc model sectionIndex =
 
 
         url =
-            updateDocPath model
+            saveDocPath model
     in
         Rails.send model.authToken "PUT" url (encodeBody jsonData)
             |> Rails.fromJson (Rails.always (Decode.succeed ()))
             |> Task.toResult
-            |> Task.map (UpdateSectionContentResponse sectionIndex)
+            |> Task.map (SaveSectionResponse sectionIndex)
 
 
 -- FIXME: pass routing information from the rails side
-updateDocPath : Model -> String
-updateDocPath model =
+saveDocPath : Model -> String
+saveDocPath model =
     "/dev/docs/" ++ model.path
