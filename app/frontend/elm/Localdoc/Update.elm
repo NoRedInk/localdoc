@@ -127,18 +127,8 @@ saveDoc model sectionIndex =
 
         encodeBody jsonData =
             Http.string (Encode.encode 0 jsonData)
-
-
-        url =
-            saveDocPath model
     in
-        Rails.send model.authToken "PUT" url (encodeBody jsonData)
+        Rails.send model.authToken "PUT" model.savePath (encodeBody jsonData)
             |> Rails.fromJson (Rails.always (Decode.succeed ()))
             |> Task.toResult
             |> Task.map (SaveSectionResponse sectionIndex)
-
-
--- FIXME: pass routing information from the rails side
-saveDocPath : Model -> String
-saveDocPath model =
-    "/dev/docs/" ++ model.path

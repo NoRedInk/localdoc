@@ -4,7 +4,8 @@ module Localdoc.Model where
 type alias Model =
     { authToken : String
     , allDocs : DocTree
-    , path : String
+    , filePath : String
+    , savePath : String
     , sections : List DocSection
     , blockingError : Maybe String
     }

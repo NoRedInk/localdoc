@@ -81,7 +81,7 @@ viewDoc address model =
         header =
             [ h1
               [ class "doc-path" ]
-              [ text model.path ]
+              [ text model.filePath ]
             ]
 
         content =

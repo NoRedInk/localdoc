@@ -4,7 +4,8 @@ module Localdoc
       doc_content, blocking_error = read_doc
       model = {
         allDocs: all_docs,
-        path: doc_relative_path.to_s,
+        filePath: doc_relative_path.to_s,
+        savePath: update_path(path: doc_relative_path.to_s),
         sections: sections(doc_content),
         blockingError: blocking_error,
       }

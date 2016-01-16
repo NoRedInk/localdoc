@@ -11,7 +11,8 @@ model =
     succeed Model
         |: ("authToken" := string)
         |: ("allDocs" := docTree)
-        |: ("path" := string)
+        |: ("filePath" := string)
+        |: ("savePath" := string)
         |: ("sections" := list docSection)
         |: ("blockingError" := maybe string)
 
