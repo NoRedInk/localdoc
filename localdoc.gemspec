@@ -18,7 +18,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", "~> 3.2.22"
   s.add_dependency "haml-rails", "~> 0.4.0"
-  s.add_dependency "rake", "~> 10.5.0"
+  s.add_dependency "rake"
 
   s.add_development_dependency "sqlite3"
   s.add_development_dependency "test-unit", "~> 3.0"
