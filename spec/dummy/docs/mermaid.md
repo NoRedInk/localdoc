@@ -10,3 +10,8 @@
 sequenceDiagram
   a->>b:hello
 :::
+
+```mermaid
+sequenceDiagram
+  a->>b:hello
+```

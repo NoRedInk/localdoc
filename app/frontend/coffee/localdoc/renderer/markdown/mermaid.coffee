@@ -29,7 +29,11 @@ renderDiagram = (source) ->
 
     return html
 
-module.exports = (options) ->
-    mermaidAPI.initialize($.extend({}, options, {startOnLoad: false}))
+module.exports =
+    init: (options) ->
+        mermaidAPI.initialize($.extend({}, options, {startOnLoad: false}))
 
-    content: contentRenderer
+    container:
+        content: contentRenderer
+
+    render: renderDiagram
