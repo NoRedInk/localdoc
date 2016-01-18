@@ -126,8 +126,7 @@ viewBodyAndFooter address model =
 
 editHelps : List Html
 editHelps =
-    [ "Editing a section title and adding new sections aren't supported: edit the doc directly with your editor."
-    , "[Mermaid syntax](http://knsv.github.io/mermaid/index.html#flowcharts-basic-syntax)"
+    [ "[Mermaid syntax](http://knsv.github.io/mermaid/index.html#flowcharts-basic-syntax)"
     ]
           |> List.map Markdown.toHtml
           |> List.map (\help -> li [] [ help ])
