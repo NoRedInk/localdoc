@@ -18,7 +18,7 @@ view address model =
     div
       [ class "page-large" ]
       [ viewAllDocs model.allDocs
-      , viewDoc address model
+      , viewDocument address model
       ]
 
 
@@ -75,14 +75,11 @@ viewDocTree nodes =
         List.concatMap viewTopLevelDocTree nodes
 
 
-viewDoc : Address Action -> Model -> Html
-viewDoc address model =
+viewDocument : Address Action -> Model -> Html
+viewDocument address model =
     let
-        header =
-            [ h1
-              [ class "doc-path" ]
-              [ text model.filePath ]
-            ]
+        docHeader =
+            viewHeader address model
 
         content =
             case model.blockingError of
@@ -90,15 +87,26 @@ viewDoc address model =
                     [ p [ class "blocking-error" ] [ text error ] ]
 
                 Nothing ->
-                    viewDocument address model
+                    viewBodyAndFooter address model
     in
         article
           [ class "doc" ]
-          (header ++ content)
+          (docHeader :: content)
 
 
-viewDocument : Address Action -> Model -> List Html
-viewDocument address model =
+viewHeader : Address Action -> Model -> Html
+viewHeader address model =
+    header
+      [ class "doc-header" ]
+      [ h1
+        [ class "doc-path" ]
+        [ text model.filePath ]
+      , viewEditLink address model
+      ]
+
+
+viewBodyAndFooter : Address Action -> Model -> List Html
+viewBodyAndFooter address model =
     let
         body =
             viewBody address model
@@ -129,25 +137,27 @@ viewBody : Address Action -> Model -> Html
 viewBody address model =
     let
         extensionSpecificClass =
-            toString model.extension
+            model.extension
                 |> String.toLower
                 |> (++) "doc-body-"
-
     in
         div
           [ classList
             [ "doc-body" => True
             , extensionSpecificClass => True
+            , "editing" => model.editing
             ]
           ]
-          [ viewRendered model
-          , viewEditLink address model
-          , viewEditor address model
+          [ viewEditor address model
+          , viewRendered model
           ]
+
 
 viewRendered : Model -> Html
 viewRendered model =
-    Html.Raw.toHtml model.renderedContent
+    div
+      [ class "doc-body-rendered" ]
+      [ Html.Raw.toHtml model.renderedContent ]
 
 
 viewEditLink : Address Action -> Model -> Html
@@ -183,11 +193,7 @@ viewEditor address model =
             on "input" targetValue (\str -> Signal.message address (contentToValue str))
     in
         div
-          [ classList
-            [ "doc-editor" => True
-            , "editing" => model.editing
-            ]
-          ]
+          [ class "doc-editor" ]
           [ textarea
             [ class "doc-editor-content"
             , onInput address (HandleRawContentInput model.extension) ]

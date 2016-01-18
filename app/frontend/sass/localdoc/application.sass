@@ -34,6 +34,25 @@ ul
   font-size: 14px
   margin-top: 14px
 
+.doc-header
+  @include display(flex)
+  @include justify-content(space-between)
+
+.doc-body.editing
+  position: absolute
+  margin: 10px
+  @include display(flex)
+  top: 50px
+  bottom: 2vh
+  left: 2vw
+  right: 2vw
+  background: white
+
+.doc-body-rendered
+  @include flex(1 1)
+  margin: 10px
+  overflow: scroll
+
 .doc-content-mermaid .label
   color: $black
 
@@ -47,12 +66,14 @@ ul
 .doc-editor
   display: none
 
-  &.editing
-    display: block
+.editing .doc-editor
+  display: flex
+  flex-direction: column
+  flex: 1 1
 
 .doc-editor-content
   width: 100%
-  height: 10em
+  flex: 1 1
   margin-bottom: 4px
 
 .doc-editor-footer
