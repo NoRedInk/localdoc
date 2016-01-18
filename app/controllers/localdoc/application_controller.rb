@@ -53,7 +53,7 @@ module Localdoc
       else
         blocking_error = 'File Not Found'
       end
-      document = {extension: params[:format], rawContent: content}
+      document = {extension: params[:format] || "", rawContent: content || ""}
       [document, blocking_error]
     end
 
