@@ -42,7 +42,9 @@ module Localdoc
     # readers
 
     def all_docs
-      read_directory_tree(doc_root, strip: doc_root)[:children]
+      roots = read_directory_tree(doc_root, strip: doc_root)[:children]
+      directories, files = roots.partition {|root| root[:isDirectory] }
+      directories << {name: "(root)", url: path_for_file(doc_root, doc_root), children: files, isDirectory: true}
     end
 
     def read_doc
@@ -60,7 +62,7 @@ module Localdoc
     # reader helpers
 
     def read_directory_tree(pathname, name: nil, strip: nil)
-      node = {name: name || pathname.to_s, url: path_for_file(pathname, strip)}
+      node = {name: name || pathname.to_s, url: path_for_file(pathname, strip), isDirectory: true}
       node[:children] = children = []
 
       return node unless pathname.exist?
@@ -69,7 +71,7 @@ module Localdoc
         if entry.directory?
           children << read_directory_tree(entry, name: entry.basename.to_s, strip: strip)
         else
-          children << {name: entry.basename.to_s, url: path_for_file(entry, strip), children: []}
+          children << {name: entry.basename.to_s, url: path_for_file(entry, strip), children: [], isDirectory: false}
         end
       end
 
