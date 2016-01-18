@@ -15,7 +15,7 @@ import Localdoc.Util exposing ((=>))
 
 view : Address Action -> Model -> Html
 view address model =
-    nav
+    div
       [ class "page-large" ]
       [ viewAllDocs model.allDocs
       , viewDoc address model
@@ -26,7 +26,7 @@ viewAllDocs : DocTree -> Html
 viewAllDocs tree =
     case tree of
         DocTree nodes ->
-            div
+            nav
               [ class "doctree" ]
               (viewDocTree nodes)
 
