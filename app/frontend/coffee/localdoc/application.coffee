@@ -20,7 +20,7 @@ $ ->
       format = extensionFormatMap[extension] || extension
       # Render all formats through markdown for now.
       unless format == "markdown"
-          content = require("./formatter/raw")(content, extension)
+          content = require("./formatter/raw")(content, format)
       rendered = md.render(content)
 
       app.ports.renderedContent.send rendered
