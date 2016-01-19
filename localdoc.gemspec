@@ -25,4 +25,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec-rails"
   s.add_development_dependency "pry-rails"
   s.add_development_dependency "byebug"
+
+  s.post_install_message = "Run `(cd `bundle show localdoc` && npm install) && rake localdoc:webpack` to generate this engine's assets."
 end
