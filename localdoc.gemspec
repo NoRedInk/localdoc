@@ -27,8 +27,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency "byebug"
 
   s.post_install_message = <<EOS
-Run the following comamnd to generate this engine's assets:
+Run the following comamnd to generate this engine's assets for the development environment:
 
-  (cd `bundle show localdoc` && npm install) && bundle exec rake localdoc:webpack
+  bundle exec rake localdoc:webpack
 EOS
 end

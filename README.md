@@ -16,6 +16,7 @@ group :development, :staging do
 end
 ```
 
+Follow the gem's post installation message to generate the required assets for your development environment.
 
 In config/routes.rb, mount the engine at the path of your choice. For example:
 
