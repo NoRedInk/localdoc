@@ -32,7 +32,19 @@ end
 In config/initializers/localdoc.rb, specify the path to the root of your documentation files. For example:
 
 ```ruby
-Localdoc.document_root = "docs" if Rails.env.development? || Rails.env.staging?
+if Rails.env.development? || Rails.env.staging?
+  Localdoc.document_root = "docs"
+
+  # You can also pass options to markdown-it and Mermaid:
+  Localdoc.markdown_options = {
+    breaks: true,
+    mermaid: {
+      sequenceDiagram: {
+        mirrorActors: true
+      }
+    }
+  }
+end
 ```
 
 ## How to write Mermaid diagrams
