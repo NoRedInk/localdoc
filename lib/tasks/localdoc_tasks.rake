@@ -2,7 +2,8 @@ namespace :localdoc do
   desc "Compile assets"
   task webpack: :environment do
     Dir.chdir(Localdoc::Engine.root) do
-      sh 'webpack'
+      sh 'npm install'
+      sh 'npm run webpack'
     end
   end
 end
