@@ -12,7 +12,7 @@ In your Gemfile, add this gem within the group that makes sense for you. For exa
 
 ```ruby
 group :development, :staging do
-  gem 'localdoc', github: 'NoRedInk/localdoc', branch: 'master'
+  gem 'localdoc', github: 'NoRedInk/localdoc', branch: 'stable'
 end
 ```
 
@@ -55,3 +55,8 @@ Write your diagram in a code block and specify `mermaid` as the language.
     graph LR
     Hello-->World
     ```
+
+## Note to contributors: how to push a new version
+
+As a pre-alpha product, this gem is not published on rubygems.org yet.
+To make new changes available, push to the `stable` branch.
