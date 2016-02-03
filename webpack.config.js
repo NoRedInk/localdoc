@@ -66,5 +66,8 @@ module.exports = {
         /\.elm$/,
         /mermaid\/dist\/www\/javascripts\/lib\/mermaid.js/
     ]
-  }
+  },
+  elm: {
+    pathToMake: './node_modules/.bin/elm-make',
+  },
 };
