@@ -7,7 +7,7 @@ markdown = require "localdoc/renderer/markdown"
 extensionFormatMap = require "localdoc/extension_format_map.json"
 
 $ ->
-  pageData.model.authToken = $('meta[name="csrf-token"]').attr('content')
+  pageData.model.authToken = $('meta[name="csrf-token"]').attr('content') || 'dummyToken'
 
   app = Elm.embed Elm.Localdoc.API, document.getElementById("elm-host"),
     modelJson: pageData.model
