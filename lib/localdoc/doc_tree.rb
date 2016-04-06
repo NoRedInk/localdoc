@@ -2,6 +2,10 @@ module Localdoc
   module DocTree
     module_function
 
+    def root_display_name
+      '(root)'
+    end
+
     def root_pathname
       fail "Set `Localdoc.document_root` to your documents directory." if Localdoc.document_root.nil?
       Pathname.new Rails.root.join(Localdoc.document_root)
@@ -12,7 +16,7 @@ module Localdoc
       root_nodes = read_directory_tree(url_helpers, root, name: root)[:children]
       directories, files = root_nodes.partition {|node| node[:isDirectory] }
       root_files = {
-        name: "(root)",
+        name: root_display_name,
         url: path_for_file(url_helpers, root, root),
         children: files,
         isDirectory: true}
