@@ -84,5 +84,3 @@ namespace :localdoc do
     end
   end
 end
-
-Rake::Task['assets:precompile'].enhance ['localdoc:webpack']
