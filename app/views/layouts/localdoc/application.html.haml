@@ -2,6 +2,7 @@
 %html
   %head
     %title= content_for(:title)
+    %meta{"http-equiv" => "content-type", "content" => "text/html; charset=UTF8"}
     = stylesheet_link_tag "https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css"
     = stylesheet_link_tag "https://cdn.rawgit.com/knsv/mermaid/0.5.6/dist/mermaid.forest.css"
     = javascript_include_tag "https://cdn.rawgit.com/knsv/mermaid/0.5.6/dist/mermaidAPI.min.js"
