@@ -6,6 +6,7 @@ require "haml"
 module Localdoc
   class Engine < ::Rails::Engine
     isolate_namespace Localdoc
+    engine_name 'localdoc'
 
     initializer "localdoc.assets.configure" do |app|
       app.config.assets.configure do |env|
